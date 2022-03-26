@@ -42,5 +42,20 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "prettier": {
+    "tabWidth": 4,
+    "printWidth": 80,
+    "semi": true,
+    "quoteProps": "consistent",
+    "bracketSpacing": true,
+    "bracketSameLine": true,
+    "singleQuote": true,
+    "jsxSingleQuote": true,
+    "jsxBracketSameLine": true,
+    "arrowParens": "avoid"
+  },
+  "devDependencies": {
+    "prettier": "^2.6.1"
   }
 }
