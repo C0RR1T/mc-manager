@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "5.4.0",
+    "generators": {
+      "nest-backend": {
+        "generatorName": "typescript-nestjs",
+        "output": "../nest-backend/src/generated",
+        "glob": "examples/v2.0/{json,yaml}/*.{json,yaml}",
+        "additionalProperties": {
+          "nestVersion": "8.0.0",
+          "npmName": "rest-server",
+          "supportsES6": "true",
+          "npmVersion": "6.9.0",
+          "withInterfaces": true
+        }
+      },
+      "react-frontend": {
+        "generatorName": "typescript-fetch",
+        "output": "../react-frontend/src/generated",
+        "glob": "examples/v2.0/{json,yaml}/*.{json,yaml}",
+        "additionalProperties": {
+          "npmName": "rest-client",
+          "supportsES6": "true",
+          "npmVersion": "6.9.0",
+          "withInterfaces": true
+        }
+      }
+    }
+  }
+}

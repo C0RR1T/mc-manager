@@ -1,0 +1,54 @@
+openapi: "3.0.3"
+info:
+  version: 0.0.1
+  title: McManager
+  description: Manager for your Minecraft servers based on docker
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /servers:
+    get:
+      tags:
+        - Server
+      summary: Get all Servers
+      operationId: getAllServers
+      responses:
+        200:
+          description: All Server as Array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Server"
+    post:
+      tags:
+        - Server
+      description: Create a new Minecraft Server
+      operationId: createServer
+      responses:
+
+
+
+
+components:
+  schemas:
+    Server:
+      required:
+        - id
+        - name
+        - port
+      properties:
+        id:
+          type: string
+          example: 242235sdgedrtz546gs
+        name:
+          type: string
+          maximum: 50
+        port:
+          type: integer
+          example: 25565
+        maxRAM:
+          type: number
+          description: Maximum RAM a server can use in GB in GB
+
