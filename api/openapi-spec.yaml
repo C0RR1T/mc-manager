@@ -2,14 +2,42 @@ openapi: "3.0.3"
 info:
   version: 0.0.1
   title: McManager
-  description: Manager for your Minecraft servers based on docker
-servers:
-  - url: http://localhost:8080/api
+  description: Manager for your Minecraft servers based on Docker
 paths:
+  /login:
+    post:
+      description: Login with a password
+      operationId: login
+      responses:
+        200:
+          description: | 
+            User successfully logged into the server. He can now use the API.
+            This response has a Set-Header header which stores the correct password in a hash.
+            This cookie should be sent with every request. It has no expiring date.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                description: Password hashed
+
+        400:
+          description: Password is wrong
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+                  example: 5E884898DA28047151D0E56F8DC6292773603D0D6AABBDD62A11EF721D1542D8
+                  description: Password in a hash
+
   /servers:
     get:
       tags:
-        - Server
+        - Servers
       summary: Get all Servers
       operationId: getAllServers
       responses:
@@ -23,10 +51,81 @@ paths:
                   $ref: "#/components/schemas/Server"
     post:
       tags:
-        - Server
+        - Servers
       description: Create a new Minecraft Server
       operationId: createServer
       responses:
+        201:
+          description: When the server was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+  /servers/{name}:
+    parameters:
+      - in: path
+        name: name
+    get:
+      tags:
+        - Server
+      description: Get Server by name
+      operationId: getServerByName
+      responses:
+        200:
+          description: Server with given name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Server"
+        404:
+          description: Server was not found
+    delete:
+      tags:
+        - Server
+      description: Delete the Server
+      responses:
+        200:
+          description: Server successfully deleted
+        404:
+          description: Server not found
+      operationId: DeleteServerByName
+  /servers/{name}/config:
+    parameters:
+      - in: path
+        name: name
+    get:
+      tags:
+        - Config
+        - Server
+      description: Get the configuration of the server
+      operationId: getConfigOfServer
+      responses:
+        200:
+          description: Config of the server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerConfig"
+        404:
+          description: Server not found
+    put:
+      tags:
+        - Config
+        - Server
+      description: Update the configuration of the server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServerConfig"
+      operationId: UpdateConfigOfServer
+      responses:
+        200:
+          description: Update successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerConfig"
 
 
 
@@ -35,20 +134,219 @@ components:
   schemas:
     Server:
       required:
-        - id
+        - isRunning
         - name
         - port
+        - type
       properties:
-        id:
-          type: string
-          example: 242235sdgedrtz546gs
         name:
           type: string
           maximum: 50
         port:
           type: integer
           example: 25565
+        isRunning:
+          description: If the server is running
+          type: boolean
+          example: true
         maxRAM:
           type: number
-          description: Maximum RAM a server can use in GB in GB
+          description: Maximum RAM a server can use in MB
+          nullable: true
+          example: 4500
+        type:
+          $ref: "#/components/schemas/ServerType"
+    ServerType:
+      description: Type of the server
+      default: vanilla
+      type: string
+      enum:
+        - vanilla
+        - forge
+        - spigot
+        - fabric
+        - paper
+        - airplane
+        - pufferfish
+        - purpur
+        - magma
+        - mohist
+        - catserver
+        - canyon
+        - spongeVanilla
+        - limo
+        - crucible
+    ServerConfig:
+      description: Config of the server stored in server.properties
+      required:
+        - view-distance
+        - max-build-height
+        - level-seed
+        - gamemode
+        - enable-command-block
+        - allow-nether
+        - enable-rcon
+        - op-permission-level
+        - enable-query
+        - prevent-proxy-connections
+        - resource-pack
+        - player-idle-timeout
+        - level-name
+        - motd
+        - force-gamemode
+        - hardcore
+        - white-list
+        - broadcast-console-to-ops
+        - pvp
+        - spawn-npcs
+        - generate-structures
+        - spawn-animals
+        - snooper-enabled
+        - difficulty
+        - network-compression-threshold
+        - level-type
+        - enum
+        - spawn-monsters
+        - max-tick-time
+        - max-players
+        - enforce-whitelist
+        - online-mode
+        - allow-flight
+        - max-world-size
+        - function-permission-level
+        - rate-limit
+        - require-resource-pack
+        - resource-pack-prompt
+        - simulation-distance
+        - hide-online-players
+      properties:
+        view-distance:
+          type: integer
+          default: 10
+          minimum: 3
+          maximum: 15
+        max-build-height:
+          type: integer
+          default: 256
+        level-seed:
+          type: string
+          default: null
+        gamemode:
+          type: integer
+          default: 0
+        enable-command-block:
+          type: boolean
+          default: false
+        allow-nether:
+          type: boolean
+          default: true
+        enable-rcon:
+          type: boolean
+          default: false
+        op-permission-level:
+          type: integer
+          default: 4
+          maximum: 4
+          minimum: 1
+        enable-query:
+          type: boolean
+          default: false
+        prevent-proxy-connections:
+          type: boolean
+          default: false
+        resource-pack:
+          type: string
+          default: null
+        player-idle-timeout:
+          type: integer
+          default: null
+        level-name:
+          type: string
+          default: world
+        motd:
+          type: string
+          default: A Minecraft Server
+        force-gamemode:
+          type: boolean
+          default: false
+        hardcore:
+          type: boolean
+          default: false
+        white-list:
+          type: boolean
+          default: false
+        broadcast-console-to-ops:
+          type: boolean
+          default: true
+        pvp:
+          type: boolean
+          default: true
+        spawn-npcs:
+          type: boolean
+          default: true
+        generate-structures:
+          type: boolean
+          default: true
+        spawn-animals:
+          type: boolean
+          default: true
+        snooper-enabled:
+          type: boolean
+          default: true
+        difficulty:
+          type: integer
+          default: 1
+        network-compression-threshold:
+          type: integer
+          default: 256
+        level-type:
+          default: DEFAULT
+          type: string
+          enum:
+            - DEFAULT
+            - FLAT
+            - LARGEBIOMES
+            - AMPLIFIED
+            - BUFFET
+        spawn-monsters:
+          type: boolean
+          default: true
+        max-tick-time:
+          type: integer
+          default: 60000
+        max-players:
+          type: integer
+          default: 20
+        enforce-whitelist:
+          type: boolean
+          default: false
+        online-mode:
+          type: boolean
+          default: true
+        allow-flight:
+          type: boolean
+          default: false
+        max-world-size:
+          type: integer
+          default: 29999984
+          maximum: 29999984
+        function-permission-level:
+          type: integer
+          default: 2
+          maximum: 4
+          minimum: 2
+        rate-limit:
+          type: integer
+          default: 0
+        require-resource-pack:
+          type: boolean
+          default: false
+        resource-pack-prompt:
+          type: string
+        simulation-distance:
+          type: integer
+        hide-online-players:
+          type: boolean
+          default: false
+
 
