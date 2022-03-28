@@ -7,7 +7,7 @@
       "nest-backend": {
         "generatorName": "typescript-nestjs",
         "output": "../nest-backend/src/generated",
-        "glob": "examples/v2.0/{json,yaml}/*.{json,yaml}",
+        "glob": "./openapi-spec.yaml",
         "additionalProperties": {
           "nestVersion": "8.0.0",
           "npmName": "rest-server",
@@ -19,7 +19,7 @@
       "react-frontend": {
         "generatorName": "typescript-fetch",
         "output": "../react-frontend/src/generated",
-        "glob": "examples/v2.0/{json,yaml}/*.{json,yaml}",
+        "glob": "./openapi-spec.yaml",
         "additionalProperties": {
           "npmName": "rest-client",
           "supportsES6": "true",

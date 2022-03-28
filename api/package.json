@@ -4,7 +4,8 @@
   "description": "API of the McManager",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "open-cli": "openapi-generator-cli generate"
   },
   "author": "",
   "license": "ISC",
