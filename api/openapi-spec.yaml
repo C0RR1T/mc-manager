@@ -10,7 +10,7 @@ paths:
       operationId: login
       responses:
         200:
-          description: | 
+          description: |
             User successfully logged into the server. He can now use the API.
             This response has a Set-Header header which stores the correct password in a hash.
             This cookie should be sent with every request. It has no expiring date.
@@ -30,8 +30,8 @@ paths:
               properties:
                 password:
                   type: string
-                  example: 5E884898DA28047151D0E56F8DC6292773603D0D6AABBDD62A11EF721D1542D8
-                  description: Password in a hash
+                  example: McManageIsTheBest:)
+                  description: Password
 
   /servers:
     get:
@@ -67,7 +67,10 @@ paths:
   /servers/{name}:
     parameters:
       - in: path
+        required: true
         name: name
+        schema:
+          type: string
     get:
       tags:
         - Server
@@ -100,6 +103,9 @@ paths:
     parameters:
       - in: path
         name: name
+        schema:
+          type: string
+        required: true
     get:
       tags:
         - Config
