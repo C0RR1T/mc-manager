@@ -1,11 +1,14 @@
 openapi: "3.0.3"
 info:
-  version: 0.0.1
+  version: 0.0.2
   title: McManager
   description: Manager for your Minecraft servers based on Docker
 paths:
   /login:
     post:
+      tags:
+        - Authorization
+      security: [ ]
       description: Login with a password
       operationId: login
       responses:
@@ -14,11 +17,20 @@ paths:
             User successfully logged into the server. He can now use the API.
             This response has a Set-Header header which stores the correct password in a hash.
             This cookie should be sent with every request. It has no expiring date.
-          headers:
-            Set-Cookie:
+          content:
+            application/json:
               schema:
-                type: string
-                description: Password hashed
+                properties:
+                  expires:
+                    description: Date when the token expires as UNIX-timestamp
+                    type: integer
+                  authToken:
+                    type: string
+                    description: Token that needs to be placed in the Authorization header of every request
+                  refreshToken:
+                    type: string
+                    description: Refresh token to get a new token when the old one gets out-of-date
+
         400:
           description: Password is wrong
       requestBody:
@@ -32,7 +44,35 @@ paths:
                   type: string
                   example: McManageIsTheBest:)
                   description: Password
-
+                username:
+                  type: string
+                  example: C0RR1T_
+                  description: username of the user, admin by default (which has every permission)
+                  default: admin
+  /refresh:
+    post:
+      tags:
+        - Authorization
+      description: Refresh the auth token by using the refresh token
+      security: [ ]
+      operationId: refreshToken
+      responses:
+        400:
+          description: Refresh token is malformed
+        401:
+          description: The refresh token is expired
+        200:
+          description: Successfully refreshed the token
+          content:
+            application/json:
+              schema:
+                properties:
+                  authToken:
+                    type: string
+                    description: the new Auth token that needs to be set as the Authorization-Header
+                  expires:
+                    type: integer
+                    description: The time the auth token expires as UNIX-timestamp
   /servers:
     get:
       tags:
@@ -49,7 +89,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Server"
         401:
-          description: Unauthorized
+          $ref: "#/components/responses/UnauthorizedError"
     post:
       tags:
         - Servers
@@ -63,7 +103,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Server"
         401:
-          description: Unauthorized
+          $ref: "#/components/responses/UnauthorizedError"
   /servers/{name}:
     parameters:
       - in: path
@@ -86,7 +126,7 @@ paths:
         404:
           description: Server was not found
         401:
-          description: Unauthorized
+          $ref: "#/components/responses/UnauthorizedError"
     delete:
       tags:
         - Server
@@ -97,7 +137,7 @@ paths:
         404:
           description: Server not found
         401:
-          description: Unauthorized
+          $ref: "#/components/responses/UnauthorizedError"
       operationId: DeleteServerByName
   /servers/{name}/config:
     parameters:
@@ -122,7 +162,7 @@ paths:
         404:
           description: Server not found
         401:
-          description: Unauthorized
+          $ref: "#/components/responses/UnauthorizedError"
     put:
       tags:
         - Config
@@ -142,12 +182,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServerConfig"
         401:
-          description: Unauthorized
+          $ref: "#/components/responses/UnauthorizedError"
 
 
 
 
 components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Server:
       required:
@@ -365,5 +410,15 @@ components:
         hide-online-players:
           type: boolean
           default: false
-
-
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+      content:
+        plain/text:
+          schema:
+            enum:
+              - token-invalid
+              - token-expired
+              - token-missing
+security:
+  - bearerAuth: [ ]
