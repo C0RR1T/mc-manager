@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { exec } from 'child_process';
 import ServerType from '../lib/ServerType';
+import { Sanitizer } from './sanitizer/sanitizer';
 
 type StartDockerArgs = {
     name: string;
@@ -12,6 +13,8 @@ type StartDockerArgs = {
 
 @Injectable()
 export class CommandlineService {
+    public constructor(private sanitizer: Sanitizer) {}
+
     private async runCommand(command: string): Promise<string> {
         return new Promise(() =>
             exec(command, (error, stdout) => {
@@ -39,8 +42,6 @@ export class CommandlineService {
         port,
         type,
     }: StartDockerArgs): Promise<string> {
-        name = name.replace("'", "\\'");
-        dir = name.replace("'", "\\'");
         return await this.runDockerCommand('start');
     }
 }
