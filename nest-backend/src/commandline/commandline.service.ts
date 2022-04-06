@@ -15,18 +15,6 @@ type StartDockerArgs = {
 export class CommandlineService {
     public constructor(private sanitizer: Sanitizer) {}
 
-    private async runCommand(command: string): Promise<string> {
-        return new Promise(() =>
-            exec(command, (error, stdout) => {
-                if (error) {
-                    return Promise.reject(error);
-                } else {
-                    return Promise.resolve(stdout);
-                }
-            })
-        );
-    }
-
     public async runDockerCommand(
         command: string,
         ...args: string[]
@@ -43,5 +31,17 @@ export class CommandlineService {
         type,
     }: StartDockerArgs): Promise<string> {
         return await this.runDockerCommand('start');
+    }
+
+    private async runCommand(command: string): Promise<string> {
+        return new Promise(() =>
+            exec(command, (error, stdout) => {
+                if (error) {
+                    return Promise.reject(error);
+                } else {
+                    return Promise.resolve(stdout);
+                }
+            })
+        );
     }
 }
