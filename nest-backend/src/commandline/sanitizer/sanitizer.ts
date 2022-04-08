@@ -13,9 +13,11 @@ export class Sanitizer {
         }
     }
 
-    private sanitizeWindowsInput = (i: string): string =>
-        (['&', '\\', '<', '>', '^', '|', '"'].includes(i) ? '^' : '') +
-        this.sanitizePercent(i);
+    private sanitizeWindowsInput = (i: string): string => {
+        const isSpecial = ['&', '\\', '<', '>', '^', '|', '"'].includes(i);
+        const escape = isSpecial ? '^' : '';
+        return escape + this.sanitizePercent(i);
+    };
 
     private sanitizePercent = (i: string): string => (i === '%' ? '%%' : i);
 }
